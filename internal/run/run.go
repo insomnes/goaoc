@@ -62,12 +62,12 @@ func Solve(year int, day int, solver Solver) error {
 	solveStart := time.Now()
 	solver.Part1(input)
 	solveDuration := time.Since(solveStart)
-	log.Printf("Solved part 1 in %s", solveDuration)
+	log.Printf("Full part 1 took %s", solveDuration)
 
 	solveStart = time.Now()
 	solver.Part2(input)
 	solveDuration = time.Since(solveStart)
-	log.Printf("Solved part 2 in %s", solveDuration)
+	log.Printf("Full part 2 took %s", solveDuration)
 	return nil
 }
 

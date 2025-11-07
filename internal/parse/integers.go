@@ -3,11 +3,12 @@ package parse
 import (
 	"log"
 	"strconv"
-	"time"
+
+	"github.com/insomnes/goaoc/internal/measure"
 )
 
 func ToIntegers(input []string) []int {
-	start := time.Now()
+	defer measure.ExecutionTimeOfParsing("integers", len(input))()
 	nums := make([]int, len(input))
 	for i, line := range input {
 		n, err := strconv.Atoi(line)
@@ -17,12 +18,11 @@ func ToIntegers(input []string) []int {
 		nums[i] = n
 	}
 
-	log.Printf("Parsed %d integers in %s", len(nums), time.Since(start))
 	return nums
 }
 
 func ToUIntegers(input []string) []uint {
-	start := time.Now()
+	defer measure.ExecutionTimeOfParsing("unsigned integers", len(input))()
 	nums := make([]uint, len(input))
 	for i, line := range input {
 		n, err := strconv.ParseUint(line, 10, 64)
@@ -31,8 +31,6 @@ func ToUIntegers(input []string) []uint {
 		}
 		nums[i] = uint(n)
 	}
-
-	log.Printf("Parsed %d unsigned integers in %s", len(nums), time.Since(start))
 
 	return nums
 }
