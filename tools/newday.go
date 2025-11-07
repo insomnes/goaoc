@@ -120,6 +120,7 @@ func (s Solution) Part2(input []string) {
 func (s Solution) CheckPart1(input []string) error {
 	parsed := parse.ToIntegers(input)
 	result := part1(parsed)
+	log.Printf("Checking Part 1: got %d, expected %d\n", result, expPart1)
 	if result != expPart1 {
 		return fmt.Errorf("expected %%d, got %%d", expPart1, result)
 	}
@@ -129,6 +130,7 @@ func (s Solution) CheckPart1(input []string) error {
 func (s Solution) CheckPart2(input []string) error {
 	parsed := parse.ToIntegers(input)
 	result := part2(parsed)
+	log.Printf("Checking Part 2: got %d, expected %d\n", result, expPart2)
 	if result != expPart2 {
 		return fmt.Errorf("expected %%d, got %%d", expPart2, result)
 	}
