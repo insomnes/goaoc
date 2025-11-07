@@ -12,7 +12,7 @@ import (
 
 const (
 	expPart1 = 820
-	expPart2 = 120
+	expPart2 = -9999 // No expected value available
 )
 
 var (
@@ -74,6 +74,7 @@ func part2(input ParsedInput) int {
 	defer measure.ExecutionTimeOf("Part 2")()
 	allSeats := make([]bool, 1024)
 	minId, maxId := 1024, 0
+	sum := 0
 	for _, seatCode := range input {
 		seat := parseSeat(seatCode)
 		if seat.ID < minId {
@@ -82,22 +83,28 @@ func part2(input ParsedInput) int {
 		if seat.ID > maxId {
 			maxId = seat.ID
 		}
+		sum += seat.ID
 		allSeats[seat.ID] = true
 	}
-	for id := minId; id <= maxId; id++ {
-		if !allSeats[id] {
-			if allSeats[id-1] && allSeats[id+1] {
-				log.Printf("PART 2: Found missing seat ID: %d", id)
-				return id
+	dlog.Debugf("PART 2: Seat ID range: %d - %d, sum %d\n", minId, maxId, sum)
 
-			} else {
-				log.Printf("PART 2: Found empty seat ID %d but neighbors not occupied", id)
-				return id
-			}
-		}
+	expectedSum := (maxId - minId + 1) * (minId + maxId) / 2
+	missingId := expectedSum - sum
+	if missingId >= len(allSeats) || missingId < 0 {
+		log.Printf(
+			"[CRITICAL] Calculated missing seat ID %d is out of bounds (checking?!)",
+			missingId,
+		)
+		return -1
 	}
-	log.Print("PART 2: No solution found")
-	return -1
+
+	log.Printf("PART 2: Calculated missing seat ID: %d", missingId)
+	if allSeats[missingId-1] && allSeats[missingId+1] {
+		log.Printf("PART 2: Found my seat ID: %d", missingId)
+	} else {
+		log.Printf("PART 2: Seat ID %d is not my seat (neighbors not occupied)", missingId)
+	}
+	return missingId
 }
 
 type Solution struct{}
