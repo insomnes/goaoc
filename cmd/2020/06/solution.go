@@ -8,6 +8,7 @@ import (
 	"github.com/insomnes/goaoc/internal/dlog"
 	"github.com/insomnes/goaoc/internal/dsa/set"
 	"github.com/insomnes/goaoc/internal/measure"
+	"github.com/insomnes/goaoc/internal/parse"
 )
 
 const (
@@ -42,9 +43,6 @@ func parseInput(lines []string) ParsedInput {
 
 	for _, line := range lines {
 		if line == "" {
-			if current.Len() == 0 {
-				log.Fatal("Empty group")
-			}
 			result = append(result, current)
 			current = Group{}
 			continue
@@ -75,26 +73,14 @@ func findGroupAnswersAny(group Group) *set.Set[rune] {
 	return allAnswers
 }
 
-func toBit(r rune) uint {
-	return uint(1) << (r - 'a')
-}
-
-func allAnswersBitset(answers string) uint {
-	var bits uint = 0
-	for _, ans := range answers {
-		bit := toBit(ans)
-		bits |= bit
-	}
-	return bits
-}
-
 func findGroupAnswersAnyBitset(group Group) uint {
 	var allAnswers uint = 0
 	for _, person := range group.persons {
 		if allAnswers == (1<<maxAnswers)-1 {
+			dlog.Debugf("All answers found, breaking early")
 			break
 		}
-		persAnswers := allAnswersBitset(person)
+		persAnswers := parse.AlphaStrToBitMask(person)
 		allAnswers |= persAnswers
 	}
 	return allAnswers
@@ -138,13 +124,14 @@ func FindGroupAnswersAll(group Group) *set.Set[rune] {
 func FindGroupAnswersAllBitset(group Group) uint {
 	minPerson := group.minPerson
 	var commonAnswers uint = 0
-	commonAnswers = allAnswersBitset(minPerson)
+	commonAnswers = parse.AlphaStrToBitMask(minPerson)
 
 	for _, person := range group.persons {
 		if commonAnswers == 0 {
+			dlog.Debugf("No common answers left, breaking early")
 			break
 		}
-		personAnswers := allAnswersBitset(person)
+		personAnswers := parse.AlphaStrToBitMask(person)
 		commonAnswers &= personAnswers
 	}
 

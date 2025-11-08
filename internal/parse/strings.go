@@ -13,3 +13,16 @@ func ToRunes(input []string) [][]rune {
 
 	return runes
 }
+
+func AlphaRuneToBit(r rune) uint {
+	return uint(1) << (r - 'a')
+}
+
+func AlphaStrToBitMask(answers string) uint {
+	var bits uint = 0
+	for _, ans := range answers {
+		bit := AlphaRuneToBit(ans)
+		bits |= bit
+	}
+	return bits
+}
