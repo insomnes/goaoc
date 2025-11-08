@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/bits"
 
 	"github.com/insomnes/goaoc/internal/dlog"
 	"github.com/insomnes/goaoc/internal/dsa/set"
@@ -36,7 +37,7 @@ type ParsedInput = []Group
 
 func parseInput(lines []string) ParsedInput {
 	defer measure.ExecutionTimeOf("Parse Input")()
-	result := make([]Group, 0)
+	result := make([]Group, len(lines))
 	var current Group
 
 	for _, line := range lines {
@@ -74,6 +75,31 @@ func findGroupAnswersAny(group Group) *set.Set[rune] {
 	return allAnswers
 }
 
+func toBit(r rune) uint {
+	return uint(1) << (r - 'a')
+}
+
+func allAnswersBitset(answers string) uint {
+	var bits uint = 0
+	for _, ans := range answers {
+		bit := toBit(ans)
+		bits |= bit
+	}
+	return bits
+}
+
+func findGroupAnswersAnyBitset(group Group) uint {
+	var allAnswers uint = 0
+	for _, person := range group.persons {
+		if allAnswers == (1<<maxAnswers)-1 {
+			break
+		}
+		persAnswers := allAnswersBitset(person)
+		allAnswers |= persAnswers
+	}
+	return allAnswers
+}
+
 func part1(input ParsedInput) int {
 	defer measure.ExecutionTimeOf("Part 1")()
 
@@ -81,7 +107,8 @@ func part1(input ParsedInput) int {
 
 	for i, group := range input {
 		dlog.Debugf("Checking group %d: %v", i, group)
-		result += findGroupAnswersAny(group).Size()
+		groupAnswers := findGroupAnswersAnyBitset(group)
+		result += bits.OnesCount(groupAnswers)
 	}
 	return result
 }
@@ -108,13 +135,30 @@ func FindGroupAnswersAll(group Group) *set.Set[rune] {
 	return commonAnswers
 }
 
+func FindGroupAnswersAllBitset(group Group) uint {
+	minPerson := group.minPerson
+	var commonAnswers uint = 0
+	commonAnswers = allAnswersBitset(minPerson)
+
+	for _, person := range group.persons {
+		if commonAnswers == 0 {
+			break
+		}
+		personAnswers := allAnswersBitset(person)
+		commonAnswers &= personAnswers
+	}
+
+	return commonAnswers
+}
+
 func part2(input ParsedInput) int {
 	defer measure.ExecutionTimeOf("Part 2")()
 	result := 0
 
 	for i, group := range input {
 		dlog.Debugf("Checking group %d: %v", i, group)
-		result += FindGroupAnswersAll(group).Size()
+		groupAnswers := FindGroupAnswersAllBitset(group)
+		result += bits.OnesCount(groupAnswers)
 	}
 	return result
 }
